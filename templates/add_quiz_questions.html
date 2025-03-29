@@ -1,0 +1,403 @@
+<!-- 
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions to Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Add Questions to Quiz: {{ chapter.name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        
+                        <div class="alert alert-info">
+                            <h5>Quiz Information</h5>
+                            <p><strong>Date:</strong> {{ quiz.date_of_quiz.strftime('%Y-%m-%d') }}</p>
+                            <p><strong>Duration:</strong> {{ quiz.time_duration }}</p>
+                            <p><strong>Questions Currently in Quiz:</strong> {{ quiz_questions|length }}</p>
+                        </div>
+                        
+                        {% if available_questions %}
+                            <form method="POST">
+                                <div class="mb-3">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="select-all" onchange="selectAllQuestions()">
+                                        <label class="form-check-label" for="select-all">
+                                            <strong>Select All Questions</strong>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 50px;">Select</th>
+                                                    <th>Question</th>
+                                                    <th>Options</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for question in available_questions %}
+                                                    <tr>
+                                                        <td>
+                                                            <input class="form-check-input" type="checkbox" name="question_ids" value="{{ question.id }}">
+                                                        </td>
+                                                        <td>{{ question.question }}</td>
+                                                        <td>
+                                                            <strong>A:</strong> {{ question.option1 }}<br>
+                                                            <strong>B:</strong> {{ question.option2 }}<br>
+                                                            <strong>C:</strong> {{ question.option3 }}<br>
+                                                            <strong>D:</strong> {{ question.option4 }}<br>
+                                                            <strong>Correct:</strong> {{ question.correct_option }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="submit" class="btn btn-primary">Add Selected Questions to Quiz</button>
+                                    <a href="{{ url_for('view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Back to Quiz</a>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <h5>No Available Questions</h5>
+                                <p>There are no questions available for this chapter. Please create questions first.</p>
+                                <a href="{{ url_for('add_question', chapter_id=chapter.id) }}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Create New Question
+                                </a>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="{{ url_for('view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Back to Quiz</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> -->
+
+
+
+
+
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions to Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Add Questions to Quiz</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Quiz Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Chapter:</strong> {{ chapter.name if chapter else 'N/A' }}</p>
+                <p><strong>Date:</strong> {{ quiz.date_of_quiz.strftime('%Y-%m-%d') if quiz.date_of_quiz else 'N/A' }}</p>
+                <p><strong>Duration:</strong> {{ quiz.time_duration if quiz.time_duration else 'N/A' }}</p>
+            </div>
+        </div>
+        
+        {% if questions %}
+            <form method="POST">
+                <div class="mb-3">
+                    <h5>Available Questions:</h5>
+                    <p class="text-muted">Select questions to include in the quiz:</p>
+                    
+                    {% for question in questions %}
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="question_ids" value="{{ question.id }}" id="question_{{ question.id }}" {% if question.quiz_id == quiz.id %}checked{% endif %}>
+                                    <label class="form-check-label" for="question_{{ question.id }}">
+                                        {{ question.question }}
+                                    </label>
+                                </div>
+                                <div class="ms-4 mt-2">
+                                    <p><small>Options:</small></p>
+                                    <ol type="1">
+                                        <li>{{ question.option1 }}</li>
+                                        <li>{{ question.option2 }}</li>
+                                        <li>{{ question.option3 }}</li>
+                                        <li>{{ question.option4 }}</li>
+                                    </ol>
+                                    <p><small>Correct option: {{ question.correct_option }}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Questions to Quiz</button>
+                <a href="{{ url_for('view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">
+                No questions available for this chapter. <a href="{{ url_for('add_question', chapter_id=chapter.id) }}">Add questions</a> first.
+            </div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> -->
+
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions to Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Add Questions to Quiz: {{ chapter.name }}</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5>Quiz Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Chapter:</strong> {{ chapter.name }}</p>
+                <p><strong>Date:</strong> {{ quiz.date_of_quiz.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Duration:</strong> {{ quiz.time_duration }}</p>
+                <p><strong>Questions Currently in Quiz:</strong> {{ quiz_questions|length }}</p>
+            </div>
+        </div>
+        
+        {% if questions %}
+            <form method="POST">
+                <div class="mb-3">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="select-all">
+                        <label class="form-check-label" for="select-all">
+                            <strong>Select All Questions</strong>
+                        </label>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">Select</th>
+                                    <th>Question</th>
+                                    <th>Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in questions %}
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input question-checkbox" type="checkbox" name="question_ids" value="{{ question.id }}"
+                                            {% if question.quiz_id == quiz.id %}checked{% endif %}>
+                                        </td>
+                                        <td>{{ question.question }}</td>
+                                        <td>
+                                            <p>A: {{ question.option1 }}</p>
+                                            <p>B: {{ question.option2 }}</p>
+                                            <p>C: {{ question.option3 }}</p>
+                                            <p>D: {{ question.option4 }}</p>
+                                            <p>Correct: {{ question.correct_option }}</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Questions to Quiz</button>
+                <a href="{{ url_for('view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Back to Quiz</a>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">
+                <p>No questions available for this chapter. Please add questions first.</p>
+                <a href="{{ url_for('add_question', chapter_id=chapter.id) }}" class="btn btn-primary mt-2">
+                    Add Questions to Chapter
+                </a>
+            </div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('select-all').addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('.question-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = this.checked;
+            }
+        });
+    </script>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions to Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Add Questions to Quiz</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5>Quiz Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Chapter:</strong> {{ chapter.name }}</p>
+                <p><strong>Subject:</strong> {{ chapter.subject.name }}</p>
+                <p><strong>Date:</strong> {{ quiz.date_of_quiz.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Duration:</strong> {{ quiz.time_duration }}</p>
+            </div>
+        </div>
+        
+        {% if questions %}
+            <form method="POST">
+                <div class="mb-3">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="select-all">
+                        <label class="form-check-label" for="select-all">
+                            <strong>Select All Questions</strong>
+                        </label>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">Select</th>
+                                    <th style="width: 45%;">Question</th>
+                                    <th style="width: 50%;">Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in questions %}
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input question-checkbox" type="checkbox" name="question_ids" value="{{ question.id }}" 
+                                                {% if question.id in current_question_ids %}checked{% endif %}>
+                                        </td>
+                                        <td>{{ question.question_text }}</td>
+                                        <td>
+                                            <ol>
+                                                <li>{{ question.option1 }}</li>
+                                                <li>{{ question.option2 }}</li>
+                                                <li>{{ question.option3 }}</li>
+                                                <li>{{ question.option4 }}</li>
+                                            </ol>
+                                            <p><strong>Correct answer:</strong> Option {{ question.correct_option }}</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Questions to Quiz</button>
+                <a href="{{ url_for('view_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">
+                <p>No questions available for this chapter. Please create questions first.</p>
+                <a href="{{ url_for('add_question', chapter_id=chapter.id) }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus"></i> Create New Question
+                </a>
+            </div>
+            
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Select all functionality
+        document.getElementById('select-all').addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('.question-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = this.checked;
+            }
+        });
+    </script>
+</body>
+</html>
