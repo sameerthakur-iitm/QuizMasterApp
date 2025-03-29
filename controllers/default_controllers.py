@@ -330,52 +330,6 @@ def create_quiz():
     
     return render_template('create_quiz.html', subjects=subjects)
 
-# Create Quiz - Step 2: Add Questions
-# @app.route('/add_quiz_questions/<int:quiz_id>', methods=['GET', 'POST'])
-# def add_quiz_questions(quiz_id):
-#     if 'admin_name' not in session:
-#         flash('You need to log in as admin first.', 'warning')
-#         return redirect(url_for('home'))
-    
-#     # Get the quiz
-#     quiz = Quiz.query.get_or_404(quiz_id)
-    
-#     # Get the chapter for this quiz
-#     chapter = Chapter.query.get_or_404(quiz.chapter_id)
-    
-#     # Get all questions for this chapter
-#     questions = QuizQuestions.query.filter_by(chapter_id=chapter.id).all()
-    
-#     if request.method == 'POST':
-#         # Get all selected question IDs from the form
-#         selected_question_ids = request.form.getlist('question_ids')
-        
-#         try:
-#             # First, unassign all questions from this quiz
-#             QuizQuestions.query.filter_by(quiz_id=quiz_id).update({QuizQuestions.quiz_id: None})
-            
-#             # Then assign only the selected questions to this quiz
-#             if selected_question_ids:
-#                 for q_id in selected_question_ids:
-#                     # Skip empty strings and only process valid IDs
-#                     if q_id and q_id.strip():
-#                         try:
-#                             question = QuizQuestions.query.get(int(q_id))
-#                             if question:
-#                                 question.quiz_id = quiz_id
-#                         except ValueError:
-#                             # Skip invalid ID values
-#                             continue
-            
-#             db.session.commit()
-#             flash('Questions added to quiz successfully!', 'success')
-#             return redirect(url_for('view_quiz', quiz_id=quiz_id))
-#         except Exception as e:
-#             db.session.rollback()
-#             flash(f'Error adding questions to quiz: {str(e)}', 'danger')
-    
-#     return render_template('add_quiz_questions.html', quiz=quiz, chapter=chapter, questions=questions)
-
 @app.route('/add_quiz_questions/<int:quiz_id>', methods=['GET', 'POST'])
 def add_quiz_questions(quiz_id):
     if 'admin_name' not in session:
@@ -384,11 +338,7 @@ def add_quiz_questions(quiz_id):
     
     quiz = Quiz.query.get_or_404(quiz_id)
     chapter = Chapter.query.get_or_404(quiz.chapter_id)
-    
-    # Get all questions for this chapter
     chapter_questions = Question.query.filter_by(chapter_id=chapter.id).all()
-    
-    # Get current question assignments for this quiz
     current_assignments = QuizQuestion.query.filter_by(quiz_id=quiz_id).all()
     current_question_ids = [assign.question_id for assign in current_assignments]
     
@@ -425,8 +375,6 @@ def add_quiz_questions(quiz_id):
                           chapter=chapter, 
                           questions=chapter_questions,
                           current_question_ids=current_question_ids)
-
-
 
 # View Quiz Details
 @app.route('/view_quiz/<int:quiz_id>')
